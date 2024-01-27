@@ -358,6 +358,9 @@ public unsafe class Canvas
     /// <param name="Color">The <see cref="Color"/> object to draw with.</param>
     public void DrawRectangle(int X, int Y, ushort Width, ushort Height, ushort Radius, Color Color)
     {
+        Width--;  // Rectangles for some reason are 1px larger
+        Height--; // than they should be, this fixes that.
+
         // Draw circles to add curvature if needed.
         if (Radius > 0)
         {
@@ -368,9 +371,10 @@ public unsafe class Canvas
         }
 
         DrawLine(X + Radius, Y, X + Width - Radius, Y, Color); // Top Line
-        DrawLine(X + Radius, Y + Height, X + Width - Radius, Height + Y + Radius == 0 ? 1 : 0, Color); // Bottom Line
+        DrawLine(X + Radius, Y + Height, X + Width - Radius, Height + Y, Color); // Bottom Line
         DrawLine(X, Y + Radius, X, Y + Height - Radius, Color); // Left Line
         DrawLine(X + Width, Y + Radius, Width + X, Y + Height - Radius, Color); // Right Line
+        this[X + Width, Y + Height] = Color; // Bottom Right Corner
     }
 
     /// <summary>
@@ -859,7 +863,9 @@ public unsafe class Canvas
     /// <param name="Font">Font to use.</param>
     /// <param name="Color">The <see cref="Color"/> object to draw with.</param>
     /// <param name="Center">Option to cented the text at X and Y.</param>
-    public void DrawString(int X, int Y, string Text, Font? Font, Color Color, bool Center = false, bool Shadow = false)
+    /// <param name="Shadow">Option to draw a shadow.</param>
+    /// <param name="SpacingModifier">Text spacing modifier.</param>
+    public void DrawString(int X, int Y, string Text, Font? Font, Color Color, bool Center = false, bool Shadow = false, int SpacingModifier = 0)
     {
         // Basic null check.
         if (string.IsNullOrEmpty(Text))
@@ -925,10 +931,10 @@ public unsafe class Canvas
                 for (int P = 0; P < Temp.Points.Count; P++)
                 {
                     // Draw actual pixel.
-                    this[BX[i] + Temp.Points[P].X, BY[i] + Temp.Points[P].Y] = Color;
+                    this[BX[i] + Temp.Points[P].X - SpacingModifier, BY[i] + Temp.Points[P].Y] = Color;
 
                     // Draw shadow.
-                    if (Shadow) { this[BX[i] + Temp.Points[P].X + 1, BY[i] + Temp.Points[P].Y + 1] = Color.Black; }
+                    if (Shadow) { this[BX[i] + Temp.Points[P].X + 1 - SpacingModifier, BY[i] + Temp.Points[P].Y + 1] = Color.Black; }
                 }
 
                 // Offset the X position by the glyph's length.
