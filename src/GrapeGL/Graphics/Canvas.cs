@@ -368,7 +368,7 @@ public unsafe class Canvas
         }
 
         DrawLine(X + Radius, Y, X + Width - Radius, Y, Color); // Top Line
-        DrawLine(X + Radius, Y + Height, X + Width - Radius, Height + Y, Color); // Bottom Line
+        DrawLine(X + Radius, Y + Height, X + Width - Radius, Height + Y + Radius == 0 ? 1 : 0, Color); // Bottom Line
         DrawLine(X, Y + Radius, X, Y + Height - Radius, Color); // Left Line
         DrawLine(X + Width, Y + Radius, Width + X, Y + Height - Radius, Color); // Right Line
     }
