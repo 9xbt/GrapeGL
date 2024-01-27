@@ -33,7 +33,7 @@ public unsafe static class Image
     /// </summary>
     /// <param name="Binary">Raw file data.</param>
     /// <returns>BMP file as a <see cref="Canvas"/> instance.</returns>
-    public static Canvas FromBitmap(byte[] Binary, bool UseBGR = true)
+    public static Canvas FromBitmap(byte[] Binary, bool UseBGR = false)
     {
         // Create reader instance.
         BinaryReader Reader = new(new MemoryStream(Binary));
