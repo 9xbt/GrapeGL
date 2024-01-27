@@ -865,7 +865,7 @@ public unsafe class Canvas
     /// <param name="Center">Option to cented the text at X and Y.</param>
     /// <param name="Shadow">Option to draw a shadow.</param>
     /// <param name="SpacingModifier">Text spacing modifier.</param>
-    public void DrawString(int X, int Y, string Text, Font? Font, Color Color, bool Center = false, bool Shadow = false, int SpacingModifier = 0)
+    public void DrawString(int X, int Y, string Text, Font? Font, Color Color, bool Center = false, bool Shadow = false)
     {
         // Basic null check.
         if (string.IsNullOrEmpty(Text))
@@ -931,10 +931,10 @@ public unsafe class Canvas
                 for (int P = 0; P < Temp.Points.Count; P++)
                 {
                     // Draw actual pixel.
-                    this[BX[i] + Temp.Points[P].X - (I * -SpacingModifier), BY[i] + Temp.Points[P].Y] = Color;
+                    this[BX[i] + Temp.Points[P].X - (I * -Font.SpacingModifier), BY[i] + Temp.Points[P].Y] = Color;
 
                     // Draw shadow.
-                    if (Shadow) { this[BX[i] + Temp.Points[P].X + 1 - (I * -SpacingModifier), BY[i] + Temp.Points[P].Y + 1] = Color.Black; }
+                    if (Shadow) { this[BX[i] + Temp.Points[P].X + 1 - (I * -Font.SpacingModifier), BY[i] + Temp.Points[P].Y + 1] = Color.Black; }
                 }
 
                 // Offset the X position by the glyph's length.
