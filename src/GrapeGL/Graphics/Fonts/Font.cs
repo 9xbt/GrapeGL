@@ -35,7 +35,7 @@ public class Font
 	/// </summary>
 	/// <param name="Text">String to measure.</param>
 	/// <returns>Width of the input string.</returns>
-	public ushort MeasureString(string Text)
+	public ushort MeasureString(string Text, int SpacingModifier = 0)
 	{
 		ushort Width = 0;
 
@@ -54,7 +54,7 @@ public class Font
 					Width += (ushort)(Size * 4);
 					continue;
 				default:
-					Width += (ushort)(GetGlyph(Text[I]).Width + 2);
+					Width += (ushort)(GetGlyph(Text[I]).Width + 2 - (I * -SpacingModifier));
 					continue;
 			}
 		}
