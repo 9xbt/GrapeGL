@@ -62,7 +62,7 @@ public class Font
 			}
 		}
 
-		return Width;
+		return (ushort)(Width + (Text.Length * SpacingModifier));
 	}
 
 	/// <summary>
