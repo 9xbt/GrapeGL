@@ -948,6 +948,17 @@ public unsafe class Canvas
     #region Misc
 
     /// <summary>
+    /// Destroys this instance of the <see cref="Canvas"/> class. Only used when it's finished being used.
+    /// </summary>
+    public void Dispose()
+    {
+        if (Internal != null)
+        {
+            NativeMemory.Free(Internal);
+        }
+    }
+
+    /// <summary>
     /// Clears the canvas with the specified color.
     /// </summary>
     /// <param name="Color">Color to clear the canvas with.</param>
