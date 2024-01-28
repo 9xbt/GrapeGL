@@ -104,7 +104,7 @@ public abstract class Display : Canvas
 	/// <summary>
 	/// The internal frame counter, used for FPS calculation.
 	/// </summary>
-	internal uint _Frames;
+	public uint _Frames;
 
 	/// <summary>
 	/// The internal FPS value, returned from <see cref="GetFPS()"/>.
