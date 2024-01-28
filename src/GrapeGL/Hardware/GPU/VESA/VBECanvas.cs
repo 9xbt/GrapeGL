@@ -48,10 +48,10 @@ public unsafe class VBECanvas : Display
 		return nameof(VBECanvas);
 	}
 
-	public override void Update()
+	public override void Update(bool IncreaseFPSCounter = true)
 	{
 		CopyTo((uint*)Multiboot2.Framebuffer->Address);
-		_Frames++;
+		if (IncreaseFPSCounter) _Frames++;
 	}
 
 	#endregion
