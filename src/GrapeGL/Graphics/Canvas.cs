@@ -868,7 +868,7 @@ public unsafe class Canvas
     public void DrawString(int X, int Y, string Text, Font? Font, Color Color, bool Center = false, bool Shadow = false)
     {
         // Basic null check.
-        if (string.IsNullOrEmpty(Text))
+        if (string.IsNullOrEmpty(Text.Trim()))
         {
             return;
         }
