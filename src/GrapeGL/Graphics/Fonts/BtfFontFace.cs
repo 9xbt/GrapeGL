@@ -1,7 +1,20 @@
 ﻿/*
- *  This code is licensed under the ekzFreeUse license.
- *  If a license wasn't included with the program,
- *  refer to https://github.com/9xbt/SVGAIITerminal/blob/main/LICENSE.md
+ *  GrapeGL - A powerful & lightweight graphics library based on PrismAPI.
+ *  Copyright © 2024 Mobren
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or (at
+ *  your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *  
+ *  You should have received a copy of the GNU General Public License along
+ *  with this program; if not, write to the Free Software Foundation, Inc.,
+ *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 using System;
@@ -57,17 +70,16 @@ public class BtfFontFace : FontFace
     {
         // Create new empty glyph.
         List<(int X, int Y)> Points = new();
-        ushort Width;
-        ushort Height;
+        ushort Width = 0;
 
         // Get the index of the character in the font.
-        int Index = PrismAPI.Graphics.Fonts.Font.DefaultCharset.IndexOf(c);
+        int Index = DefaultCharset.IndexOf(c);
 
         // Check if there is a glyph for the given character.
         if (Index < 0)
         {
             // Return an empty glyph.
-            return new(0, 0, _size / 2, _size, Temp.Points);
+            return new(0, 0, _size / 2, _size, Points);
         }
 
         ushort SizePerFont = (ushort)(_size * _size8 * Index);
@@ -83,15 +95,15 @@ public class BtfFontFace : FontFace
 
                 int Max = (X * 8) + ww;
 
-                Temp.Points.Add((Max, Y));
+                Points.Add((Max, Y));
 
                 // Get max font width used.
-                Temp.Width = (ushort)Math.Max(Temp.Width, Max);
+                Width = (ushort)Math.Max(Width, Max);
             }
         }
 
         // Return the glyph.
-        return new(0, 0, Temp.Width, _size, Temp.Points);
+        return new(0, 0, Width, _size, Points);
     }
 
     public override string GetFamilyName() => "N/A";
@@ -109,6 +121,11 @@ public class BtfFontFace : FontFace
 
         return _glyphs[c - 32];
     }
+
+    /// <summary>
+	/// The standard charset of all fonts.
+	/// </summary>
+    public const string DefaultCharset = "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
 
     /// <summary>
     /// The binary data of the BTF font face.
