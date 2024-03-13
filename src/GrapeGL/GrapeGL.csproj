@@ -6,15 +6,34 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <Optimize>true</Optimize>
+        <Title>GrapeGL</Title>
+        <Version>1.0</Version>
+        <Description>A powerful &amp; lightweight graphics library based on PrismAPI </Description>
+        <Copyright>Copyright © 2023-2024 Mobren</Copyright>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <RepositoryUrl>https://github.com/9xbt/GrapeGL</RepositoryUrl>
+        <PackageTags>csharp, cosmos-os</PackageTags>
+        <PackageLicenseFile>LICENSE</PackageLicenseFile>
+        <RepositoryType>git</RepositoryType>
+		    <PackageReleaseNotes></PackageReleaseNotes>
     </PropertyGroup>
 
     <ItemGroup>
+		  <None Include="..\..\LICENSE">
+			  <Pack>True</Pack>
+			  <PackagePath>\</PackagePath>
+		</None>
+			  <None Include="..\..\README.md">
+			  <Pack>True</Pack>
+			  <PackagePath>\</PackagePath>
+		</None>
+	</ItemGroup>
 
+    <ItemGroup>
 		<PackageReference Include="Cosmos.Plugs" Version="0.1.0-*" />
 		<PackageReference Include="Cosmos.System2" Version="0.1.0-*" />
 		<PackageReference Include="Cosmos.HAL2" Version="0.1.0-*" />
 		<PackageReference Include="TinyMath" Version="*" />
-
 	</ItemGroup>
 
 </Project>
