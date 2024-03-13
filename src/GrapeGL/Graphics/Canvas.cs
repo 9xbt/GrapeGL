@@ -1,8 +1,9 @@
-﻿using System.Numerics;
-using System.Runtime.InteropServices;
-using Cosmos.Core;
+﻿using Cosmos.Core;
+using Cosmos.System.Graphics.Fonts;
 using GrapeGL.Graphics.Fonts;
 using GrapeGL.Graphics.Rasterizer;
+using System.Numerics;
+using System.Runtime.InteropServices;
 
 namespace GrapeGL.Graphics;
 
@@ -854,6 +855,7 @@ public unsafe class Canvas
 
     #region Text
 
+    /*
     /// <summary>
     /// Draws a string of text at X and Y.
     /// </summary>
@@ -862,9 +864,14 @@ public unsafe class Canvas
     /// <param name="Text">Text to draw.</param>
     /// <param name="Font">Font to use.</param>
     /// <param name="Color">The <see cref="Color"/> object to draw with.</param>
+<<<<<<< Updated upstream
     /// <param name="Center">Option to cented the text at X and Y.</param>
     /// <param name="Shadow">Option to draw a shadow.</param>
     /// <param name="SpacingModifier">Text spacing modifier.</param>
+=======
+    /// <param name="Center">Option to center the text at X and Y.</param>
+    /// <param name="Shadow">Option to add a shadow to the text.</param>
+>>>>>>> Stashed changes
     public void DrawString(int X, int Y, string Text, Font? Font, Color Color, bool Center = false, bool Shadow = false)
     {
         // Basic null check.
@@ -935,6 +942,101 @@ public unsafe class Canvas
 
                     // Draw shadow.
                     if (Shadow) { this[BX[i] + Temp.Points[P].X + 1 - (I * -Font.SpacingModifier), BY[i] + Temp.Points[P].Y + 1] = Color.Black; }
+                }
+
+                // Offset the X position by the glyph's length.
+                BX[i] += Temp.Width + 2;
+            }
+        }
+    }
+    */
+
+    /// <summary>
+    /// Draws a string of text at X and Y.
+    /// </summary>
+    /// <param name="X">X position.</param>
+    /// <param name="Y">Y position.</param>
+    /// <param name="Text">Text to draw.</param>
+    /// <param name="Font">Font to use.</param>
+    /// <param name="Color">The <see cref="Color"/> object to draw with.</param>
+    /// <param name="Center">Option to center the text at X and Y.</param>
+    /// <param name="Shadow">Option to add a shadow to the text.</param>
+    public void DrawString(int X, int Y, string Text, BtfFontFace Font, Color Color, bool Center = false, bool Shadow = false)
+    {
+        // Basic null check.
+        if (string.IsNullOrEmpty(Text))
+        {
+            return;
+        }
+
+        // Quit if nothing needs to be drawn.
+        if (X >= Width || Y >= Height)
+        {
+            return;
+        }
+
+        // Allow the use of the 'default' keyword for text drawing.
+        //if (Font == default)
+        //{
+        //    Font = Font.Fallback;
+        //}
+
+        // Split Text at new line characters.
+        string[] TextLines = Text.Split('\n');
+
+        // Create coordinate arrays.
+        int[] BX = new int[TextLines.Length];
+        int[] BY = new int[TextLines.Length];
+
+        // Set temporary values.
+        for (int i = 0; i < BX.Length; i++) BX[i] = X;
+        for (int i = 0; i < BY.Length; i++) BY[i] = Y + Font.GetHeight() * i;
+
+        // Loop though the split lines.
+        for (int i = 0; i < TextLines.Length; i++)
+        {
+            // Pre-calculate the string's size.
+            ushort TextWidth = Font.MeasureString(TextLines[i]);
+
+            // Check if the text needs to be centered.
+            if (Center)
+            {
+                BY[i] -= Font.GetHeight() * (TextLines.Length + 1) / 2;
+                BX[i] -= TextWidth / 2;
+            }
+
+            // Loop through each character in the line.
+            for (int I = 0; I < TextLines[i].Length; I++)
+            {
+                switch (TextLines[i][I])
+                {
+                    case '\0':
+                        continue;
+                    case ' ':
+                        BX[i] += Font.GetHeight() / 2;
+                        continue;
+                    case '\t':
+                        BX[i] += Font.GetHeight() * 4;
+                        continue;
+                }
+
+                // Get the glyph for this char.
+                Glyph? Temp = Font.GetGlyph(TextLines[i][I]);
+
+                // Continue if the glyph for this char is null.
+                if (Temp == null)
+                {
+                    continue;
+                }
+
+                // Draw all pixels.
+                for (int P = 0; P < Temp.Points.Count; P++)
+                {
+                    // Draw actual pixel.
+                    this[BX[i] + Temp.Points[P].X, BY[i] + Temp.Points[P].Y] = Color;
+
+                    // Draw shadow.
+                    if (Shadow) { this[BX[i] + Temp.Points[P].X + 1, BY[i] + Temp.Points[P].Y + 1] = Color.Black; }
                 }
 
                 // Offset the X position by the glyph's length.

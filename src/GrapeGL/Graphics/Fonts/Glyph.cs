@@ -1,32 +1,81 @@
-﻿namespace GrapeGL.Graphics.Fonts;
+/*
+ *  This file is part of the Mirage Desktop Environment.
+ *  github.com/mirage-desktop/Mirage
+ */
+
+using System;
+using System.Collections.Generic;
+
+namespace GrapeGL.Graphics.Fonts;
 
 /// <summary>
-/// The glyph class, used for caching font glyphs.
-/// See: https://github.com/Project-Prism/Prism-OS/tree/main/PrismGraphics/Font/README.md#Glyphs
+/// Represents a single, reusable glyph for a character.
 /// </summary>
 public class Glyph
 {
-	#region Constructors
+    /// <summary>
+    /// Initializes a new glyph.
+    /// </summary>
+    /// <param name="left">The horizontal offset of the glyph's bitmap.</param>
+    /// <param name="top">The vertical offset of the glyph's bitmap.</param>
+    /// <param name="width">The width of the glyph's bitmap in pixels.</param>
+    /// <param name="height">The height of the glyph's bitmap in pixels.</param>
+    /// <param name="bitmap">The buffer of the glyph's bitmap, as an array of alpha values.</param>
+    public Glyph(int left, int top, int width, int height, byte[] bitmap)
+    {
+        Left = left;
+        Top = top;
+        Width = width;
+        Height = height;
+        Bitmap = bitmap;
+        Points = new List<(int X, int Y)>();
+    }
 
-	/// <summary>
-	/// Creates a new instance of the <see cref="Glyph"/> class.
-	/// </summary>
-	/// <param name="Width">The width of the glyph.</param>
-	/// <param name="Height">The height of the glyph.</param>
-	public Glyph(ushort Width, ushort Height)
-	{
-		this.Height = Height;
-		this.Width = Width;
-		Points = new();
-	}
+    /// <summary>
+    /// Initializes a new glyph.
+    /// </summary>
+    /// <param name="left">The horizontal offset of the glyph's bitmap.</param>
+    /// <param name="top">The vertical offset of the glyph's bitmap.</param>
+    /// <param name="width">The width of the glyph's bitmap in pixels.</param>
+    /// <param name="height">The height of the glyph's bitmap in pixels.</param>
+    /// <param name="points">The buffer of the glyph's bitmap, as a list of points.</param>
+    public Glyph(int left, int top, int width, int height, List<(int X, int Y)> points)
+    {
+        Left = left;
+        Top = top;
+        Width = width;
+        Height = height;
+        Bitmap = Array.Empty<byte>();
+        Points = points;
+    }
 
-	#endregion
+    /// <summary>
+    /// The horizontal offset of the glyph's bitmap.
+    /// </summary>
+    public readonly int Left;
 
-	#region Fields
+    /// <summary>
+    /// The vertical offset of the glyph's bitmap. Should be subtracted from the baseline.
+    /// </summary>
+    public readonly int Top;
 
-	public List<(int X, int Y)> Points;
-	public ushort Height;
-	public ushort Width;
+    /// <summary>
+    /// The width of the glyph's bitmap in pixels.
+    /// </summary>
+    public readonly int Width;
 
-	#endregion
+    /// <summary>
+    /// The height of the glyph's bitmap in pixels.
+    /// </summary>
+    public readonly int Height;
+
+    /// <summary>
+    /// The buffer of the glyph's bitmap, as an array of alpha values.
+    /// </summary>
+    public readonly byte[] Bitmap;
+
+    /// <summary>
+    /// The buffer of the glyph's bitmap, as a list of points.
+    /// </summary>
+    public readonly List<(int X, int Y)> Points;
 }
