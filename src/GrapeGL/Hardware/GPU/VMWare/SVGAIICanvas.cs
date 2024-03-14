@@ -234,7 +234,7 @@ public unsafe class SVGAIICanvas : Display
 		return nameof(SVGAIICanvas);
 	}
 
-	public override void Update(bool IncreaseFPSCounter = true)
+	public override void Update()
 	{
 		CopyTo(ScreenBuffer);
 
@@ -245,7 +245,7 @@ public unsafe class SVGAIICanvas : Display
 		WriteToFifo(Height);
 		WaitForFifo();
 
-		if (IncreaseFPSCounter) _Frames++;
+		_Frames++;
 	}
 
 	#endregion
