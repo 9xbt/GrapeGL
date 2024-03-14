@@ -1023,7 +1023,7 @@ public unsafe class Canvas
     /// <summary>
     /// The graphics frame buffer, with a size matching <see cref="Size"/>.
     /// </summary>
-    internal uint* Internal;
+    public uint* Internal;
 
     #endregion
 }
