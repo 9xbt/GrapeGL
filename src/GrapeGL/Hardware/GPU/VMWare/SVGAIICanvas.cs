@@ -248,6 +248,20 @@ public unsafe class SVGAIICanvas : Display
 		_Frames++;
 	}
 
+	public override void Update(bool IncreaseFPSCounter)
+	{
+		CopyTo(ScreenBuffer);
+
+		WriteToFifo((uint)FIFOCommand.Update);
+		WriteToFifo(0);
+		WriteToFifo(0);
+		WriteToFifo(Width);
+		WriteToFifo(Height);
+		WaitForFifo();
+
+		if (IncreaseFPSCounter) _Frames++;
+	}
+
 	#endregion
 
 	#region Fields

@@ -89,6 +89,11 @@ public abstract class Display : Canvas
 	public abstract void Update();
 
 	/// <summary>
+	/// Copies the second buffer to the primary display buffer.
+	/// </summary>
+	public abstract void Update(bool IncreaseFPSCounter);
+
+	/// <summary>
 	/// Gets the FPS measurment of the display.
 	/// </summary>
 	/// <returns>The FPS as a uint number.</returns>
