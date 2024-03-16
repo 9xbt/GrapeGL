@@ -4,6 +4,7 @@
  */
 
 using System;
+using System.Dynamic;
 using System.IO;
 using System.Text;
 
@@ -188,6 +189,16 @@ public class AcfFontFace : FontFace
         return _glyphs[c];
     }
 
+    public override ushort MeasureString(string s) {
+        ushort returnVal = 0;
+
+        for (int i = 0; i < s.Length; i++) returnVal = (ushort)(returnVal + (GetGlyph(s[i])!.Width + 2));
+
+        return (ushort)(returnVal + (s.Length * SpacingModifier()));
+    }
+
+    public override int SpacingModifier() { return _spacingModifier; }
+
     /// <summary>
     /// The stream to read the ACF font face's data from.
     /// </summary>
@@ -222,4 +233,9 @@ public class AcfFontFace : FontFace
     /// The glyphs of the font face in ASCII.
     /// </summary>
     private readonly Glyph[] _glyphs = new Glyph[256];
+
+    /// <summary>
+	/// Character spacing offset.
+	/// </summary>
+    private int _spacingModifier = 0;
 }

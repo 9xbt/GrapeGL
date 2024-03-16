@@ -33,9 +33,10 @@ public class BtfFontFace : FontFace
     /// </summary>
     /// <param name="binary">The font data.</param>
     /// <param name="size">The size (height) of the font.</param>
-    public BtfFontFace(byte[] binary, ushort size)
+    public BtfFontFace(byte[] binary, ushort size, int SpacingModifier = 0)
     {
         _binary = binary;
+        _spacingModifier = SpacingModifier;
 
         ParseHeight(size);
         ParseGlyphs();
@@ -122,6 +123,16 @@ public class BtfFontFace : FontFace
         return _glyphs[c - 32];
     }
 
+    public override ushort MeasureString(string s) {
+        ushort returnVal = 0;
+
+        for (int i = 0; i < s.Length; i++) returnVal = (ushort)(returnVal + (GetGlyph(s[i])!.Width + 2));
+
+        return (ushort)(returnVal + (s.Length * SpacingModifier()));
+    }
+
+    public override int SpacingModifier() { return _spacingModifier; }
+
     /// <summary>
 	/// The standard charset of all fonts.
 	/// </summary>
@@ -146,4 +157,9 @@ public class BtfFontFace : FontFace
     /// The glyphs of the font face in ASCII ranging from 0x20 to 0x7F.
     /// </summary>
     private readonly Glyph[] _glyphs = new Glyph[96];
+
+    /// <summary>
+	/// Character spacing offset.
+	/// </summary>
+    private int _spacingModifier = 0;
 }

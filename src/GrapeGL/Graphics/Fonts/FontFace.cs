@@ -34,4 +34,8 @@ public abstract class FontFace
     /// <param name="c">The character to get the glyph for.</param>
     /// <returns>The glyph, if any. Note that the glyph may not have a bitmap in the case of whitespace characters.</returns>
     public abstract Glyph? GetGlyph(char c);
+
+    public abstract ushort MeasureString(string s);
+
+    public abstract int SpacingModifier();
 }
