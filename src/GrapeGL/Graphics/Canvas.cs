@@ -855,6 +855,63 @@ public unsafe class Canvas
 
     #region Text
 
+    public void DrawGlyph(int X, int Y, Glyph Glyph, Color Color, bool Shadow = false) {
+        if (Glyph.Points.Count == 0) {
+            // ACF
+
+            // Draw all pixels.
+            // Draw the ACF glyph.
+            for (int yy = 0; yy < Glyph.Height; yy++)
+            {
+                for (int xx = 0; xx < Glyph.Width; xx++)
+                {
+                    // Get the alpha value of the glyph's pixel and the inverted value.
+                    uint alpha = Glyph.Bitmap[yy * Glyph.Width + xx];
+                    uint invAlpha = (uint)-alpha;
+
+                    // Get the index of the framebuffer of where to draw the point at.
+                    int canvasIdx = (Y + yy - Glyph.Top) * Width + X + xx;
+
+                    // Get the background ARGB value and the glyph color's ARGB value.
+                    uint backgroundArgb = Internal[canvasIdx];
+                    uint glyphColorArgb = Color.ARGB;
+
+                    // Store the individual background color's R, G and B values.
+                    byte backgroundR = (byte)((backgroundArgb >> 16) & 0xFF);
+                    byte backgroundG = (byte)((backgroundArgb >> 8) & 0xFF);
+                    byte backgroundB = (byte)(backgroundArgb & 0xFF);
+
+                    // Store the individual glyph foreground color's R, G and B values.
+                    byte foregroundR = (byte)((glyphColorArgb >> 16) & 0xFF);
+                    byte foregroundG = (byte)((glyphColorArgb >> 8) & 0xFF);
+                    byte foregroundB = (byte)((glyphColorArgb) & 0xFF);
+
+                    // Get the individual R, G and B values for the blended color.
+                    byte r = (byte)((alpha * foregroundR + invAlpha * backgroundR) >> 8);
+                    byte g = (byte)((alpha * foregroundG + invAlpha * backgroundG) >> 8);
+                    byte b = (byte)((alpha * foregroundB + invAlpha * backgroundB) >> 8);
+
+                    // Store the blended color in an unsigned integer.
+                    uint color = ((uint)255 << 24) | ((uint)r << 16) | ((uint)g << 8) | b;
+
+                    // Set the pixel to the blended color.
+                    Internal[canvasIdx] = color;
+                }
+            }
+        }
+        else {
+            // Draw all pixels.
+            for (int P = 0; P < Glyph.Points.Count; P++)
+            {
+                // Draw actual pixel.
+                this[X + Glyph.Points[P].X, Y + Glyph.Points[P].Y] = Color;
+
+                // Draw shadow.
+                if (Shadow) { this[X + Glyph.Points[P].X + 1, Y + Glyph.Points[P].Y + 1] = Color.Black; }
+            }
+        }
+    }
+
     /// <summary>
     /// Draws a string of text at X and Y with an ACF font.
     /// </summary>
@@ -1059,6 +1116,23 @@ public unsafe class Canvas
                 BX[i] += Temp.Width + 2;
             }
         }
+    }
+
+    /// <summary>
+    /// Draws a string of text at X and Y with an ACF font.
+    /// </summary>
+    /// <param name="X">X position.</param>
+    /// <param name="Y">Y position.</param>
+    /// <param name="Text">Text to draw.</param>
+    /// <param name="Font">Font to use.</param>
+    /// <param name="Color">The <see cref="Color"/> object to draw with.</param>
+    /// <param name="Center">Option to center the text at X and Y.</param>
+    /// <param name="Shadow">Option to add a shadow to the text.</param>
+    public void DrawString(int X, int Y, string Text, FontFace Font, Color Color, bool Center = false, bool Shadow = false)
+    {
+        if (Font.GetType() == typeof(AcfFontFace)) DrawString(X, Y, Text, (AcfFontFace)Font, Color, Center);
+        else if (Font.GetType() == typeof(BtfFontFace)) DrawString(X, Y, Text, (BtfFontFace)Font, Color, Center, Shadow);
+        else throw new NotImplementedException("Unsupported font type!");
     }
 
     #endregion
