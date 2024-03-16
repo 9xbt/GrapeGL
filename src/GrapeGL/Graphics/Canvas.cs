@@ -1018,7 +1018,7 @@ public unsafe class Canvas
                             BX[i] += Font.GetHeight() / 2;
                             continue;
                         case '\t':
-                        BX[i] += Font.GetHeight() * 4;
+                            BX[i] += Font.GetHeight() * 4;
                             continue;
                     }
 
@@ -1047,7 +1047,93 @@ public unsafe class Canvas
             }
         }
         else {
-           
+           // Loop though the split lines.
+            for (int i = 0; i < TextLines.Length; i++)
+            {   
+                // Precalculate the string's size.
+                ushort TextWidth = Font.MeasureString(TextLines[i]);
+
+                // Check if the text needs to be centered.
+                if (Center)
+                {
+                    BY[i] -= Font.GetHeight() * (TextLines.Length + 1) / 2;
+                    BX[i] -= TextWidth / 2;
+                }
+
+                // Loop through each character in the line.
+                for (int I = 0; I < TextLines[i].Length; I++)
+                {
+                    switch (TextLines[i][I])
+                    {
+                        case '\0':
+                            continue;
+                        case ' ':
+                            BX[i] += Font.GetHeight() / 2;
+                            continue;
+                        case '\t':
+                            BX[i] += Font.GetHeight() * 4;
+                            continue;
+                    }
+
+                    // Get the glyph for this char.
+                    Glyph? Temp = Font.GetGlyph(TextLines[i][I]);
+
+                    // Continue if the glyph for this char is null.
+                    if (Temp == null)
+                    {
+                        continue;
+                    }
+
+                    // Draw actual pixel.
+                    //this[BX[i] + Temp.Points[P].X - (I * -Font.SpacingModifier()), BY[i] + Temp.Points[P].Y] = Color;
+
+                    // Draw shadow.
+                    //if (Shadow) { this[BX[i] + Temp.Points[P].X + 1 - (I * -Font.SpacingModifier()), BY[i] + Temp.Points[P].Y + 1] = Color.Black; }
+
+                    // Draw all pixels.
+                    // Draw the ACF glyph.
+                    for (int yy = 0; yy < Temp.Height; yy++)
+                    {
+                        for (int xx = 0; xx < Temp.Width; xx++)
+                        {
+                            // Get the alpha value of the glyph's pixel and the inverted value.
+                            uint alpha = Temp.Bitmap[yy * Temp.Width + xx];
+                            uint invAlpha = alpha - 2 - (alpha * 2);
+
+                            // Get the index of the framebuffer of where to draw the point at.
+                            int canvasIdx = (BY[i] + Y + yy - Temp.Top) * Width + BX[i] + X + xx;
+
+                            // Get the background ARGB value and the glyph color's ARGB value.
+                            uint backgroundArgb = Internal[canvasIdx];
+                            uint glyphColorArgb = Color.ARGB;
+                                    
+                            // Store the individual background color's R, G and B values.
+                            byte backgroundR = (byte)((backgroundArgb >> 16) & 0xFF);
+                            byte backgroundG = (byte)((backgroundArgb >> 8) & 0xFF);
+                            byte backgroundB = (byte)(backgroundArgb & 0xFF);
+
+                            // Store the individual glyph foreground color's R, G and B values.
+                            byte foregroundR = (byte)((glyphColorArgb >> 16) & 0xFF);
+                            byte foregroundG = (byte)((glyphColorArgb >> 8) & 0xFF);
+                            byte foregroundB = (byte)((glyphColorArgb) & 0xFF);
+                                    
+                            // Get the individual R, G and B values for the blended color.
+                            byte r = (byte)((alpha * foregroundR + invAlpha * backgroundR) >> 8);
+                            byte g = (byte)((alpha * foregroundG + invAlpha * backgroundG) >> 8);
+                            byte b = (byte)((alpha * foregroundB + invAlpha * backgroundB) >> 8);
+                                    
+                            // Store the blended color in an unsigned integer.
+                            uint color = ((uint)255 << 24) | ((uint)r << 16) | ((uint)g << 8) | b;
+                        
+                            // Set the pixel to the blended color.
+                            Internal[canvasIdx] = color;
+                        }
+                    }
+
+                    // Offset the X position by the glyph's length.
+                    BX[i] += Temp.Width + 2;
+                }
+            }
         }
     }
 
