@@ -35,7 +35,16 @@ public abstract class FontFace
     /// <returns>The glyph, if any. Note that the glyph may not have a bitmap in the case of whitespace characters.</returns>
     public abstract Glyph? GetGlyph(char c);
 
+    /// <summary>
+    /// Measures a string.
+    /// </summary>
+    /// <param name="s">The string to measure.</param>
+    /// <returns>The width of the measured string.</returns>
     public abstract ushort MeasureString(string s);
 
+    /// <summary>
+    /// Gets the spacing modifier for BitFont fonts.
+    /// </summary>
+    /// <returns>The spacing modifier for the font</returns>
     public abstract int SpacingModifier();
 }

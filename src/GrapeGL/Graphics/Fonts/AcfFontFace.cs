@@ -197,7 +197,7 @@ public class AcfFontFace : FontFace
         return (ushort)(returnVal + (s.Length * SpacingModifier()));
     }
 
-    public override int SpacingModifier() { return _spacingModifier; }
+    public override int SpacingModifier() => 0;
 
     /// <summary>
     /// The stream to read the ACF font face's data from.
@@ -233,9 +233,4 @@ public class AcfFontFace : FontFace
     /// The glyphs of the font face in ASCII.
     /// </summary>
     private readonly Glyph[] _glyphs = new Glyph[256];
-
-    /// <summary>
-	/// Character spacing offset.
-	/// </summary>
-    private int _spacingModifier = 0;
 }
