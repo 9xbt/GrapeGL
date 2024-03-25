@@ -1,8 +1,9 @@
-﻿using System.Numerics;
-using System.Runtime.InteropServices;
-using Cosmos.Core;
+﻿using Cosmos.Core;
+using Cosmos.System.Graphics.Fonts;
 using GrapeGL.Graphics.Fonts;
 using GrapeGL.Graphics.Rasterizer;
+using System.Numerics;
+using System.Runtime.InteropServices;
 
 namespace GrapeGL.Graphics;
 
@@ -854,21 +855,77 @@ public unsafe class Canvas
 
     #region Text
 
+    public void DrawGlyph(int X, int Y, Glyph Glyph, Color Color, bool Shadow = false) {
+        if (Glyph.Points.Count == 0) {
+            // ACF
+
+            // Draw all pixels.
+            // Draw the ACF glyph.
+            for (int yy = 0; yy < Glyph.Height; yy++)
+            {
+                for (int xx = 0; xx < Glyph.Width; xx++)
+                {
+                    // Get the alpha value of the glyph's pixel and the inverted value.
+                    uint alpha = Glyph.Bitmap[yy * Glyph.Width + xx];
+                    uint invAlpha = (uint)-alpha;
+
+                    // Get the index of the framebuffer of where to draw the point at.
+                    int canvasIdx = (Y + yy - Glyph.Top) * Width + X + xx;
+
+                    // Get the background ARGB value and the glyph color's ARGB value.
+                    uint backgroundArgb = Internal[canvasIdx];
+                    uint glyphColorArgb = Color.ARGB;
+
+                    // Store the individual background color's R, G and B values.
+                    byte backgroundR = (byte)((backgroundArgb >> 16) & 0xFF);
+                    byte backgroundG = (byte)((backgroundArgb >> 8) & 0xFF);
+                    byte backgroundB = (byte)(backgroundArgb & 0xFF);
+
+                    // Store the individual glyph foreground color's R, G and B values.
+                    byte foregroundR = (byte)((glyphColorArgb >> 16) & 0xFF);
+                    byte foregroundG = (byte)((glyphColorArgb >> 8) & 0xFF);
+                    byte foregroundB = (byte)((glyphColorArgb) & 0xFF);
+
+                    // Get the individual R, G and B values for the blended color.
+                    byte r = (byte)((alpha * foregroundR + invAlpha * backgroundR) >> 8);
+                    byte g = (byte)((alpha * foregroundG + invAlpha * backgroundG) >> 8);
+                    byte b = (byte)((alpha * foregroundB + invAlpha * backgroundB) >> 8);
+
+                    // Store the blended color in an unsigned integer.
+                    uint color = ((uint)255 << 24) | ((uint)r << 16) | ((uint)g << 8) | b;
+
+                    // Set the pixel to the blended color.
+                    Internal[canvasIdx] = color;
+                }
+            }
+        }
+        else {
+            // Draw all pixels.
+            for (int P = 0; P < Glyph.Points.Count; P++)
+            {
+                // Draw actual pixel.
+                this[X + Glyph.Points[P].X, Y + Glyph.Points[P].Y] = Color;
+
+                // Draw shadow.
+                if (Shadow) { this[X + Glyph.Points[P].X + 1, Y + Glyph.Points[P].Y + 1] = Color.Black; }
+            }
+        }
+    }
+
     /// <summary>
-    /// Draws a string of text at X and Y.
+    /// Draws a string of text at X and Y with an ACF font.
     /// </summary>
     /// <param name="X">X position.</param>
     /// <param name="Y">Y position.</param>
     /// <param name="Text">Text to draw.</param>
     /// <param name="Font">Font to use.</param>
     /// <param name="Color">The <see cref="Color"/> object to draw with.</param>
-    /// <param name="Center">Option to cented the text at X and Y.</param>
-    /// <param name="Shadow">Option to draw a shadow.</param>
-    /// <param name="SpacingModifier">Text spacing modifier.</param>
-    public void DrawString(int X, int Y, string Text, Font? Font, Color Color, bool Center = false, bool Shadow = false)
+    /// <param name="Center">Option to center the text at X and Y.</param>
+    /// <param name="Shadow">Option to add a shadow to the text.</param>
+    public void DrawString(int X, int Y, string Text, AcfFontFace Font, Color Color, bool Center = false)
     {
         // Basic null check.
-        if (string.IsNullOrEmpty(Text.Trim()))
+        if (string.IsNullOrEmpty(Text))
         {
             return;
         }
@@ -879,33 +936,27 @@ public unsafe class Canvas
             return;
         }
 
-        // Allow the use of the 'default' keyword for text drawing.
-        if (Font == default)
-        {
-            Font = Font.Fallback;
-        }
-
         // Split Text at new line characters.
         string[] TextLines = Text.Split('\n');
-        
+
         // Create coordinate arrays.
         int[] BX = new int[TextLines.Length];
         int[] BY = new int[TextLines.Length];
-        
+
         // Set temporary values.
         for (int i = 0; i < BX.Length; i++) BX[i] = X;
-        for (int i = 0; i < BY.Length; i++) BY[i] = Y + Font.Size * i;
-        
+        for (int i = 0; i < BY.Length; i++) BY[i] = Y + Font.GetHeight() * i;
+
         // Loop though the split lines.
         for (int i = 0; i < TextLines.Length; i++)
         {
-            // Pre-calculate the string's size.
+            // Precalculate the string's size.
             ushort TextWidth = Font.MeasureString(TextLines[i]);
 
             // Check if the text needs to be centered.
             if (Center)
             {
-                BY[i] -= Font.Size * (TextLines.Length + 1) / 2;
+                BY[i] -= Font.GetHeight() * (TextLines.Length + 1) / 2;
                 BX[i] -= TextWidth / 2;
             }
 
@@ -917,30 +968,171 @@ public unsafe class Canvas
                     case '\0':
                         continue;
                     case ' ':
-                        BX[i] += Font.Size / 2;
+                        BX[i] += Font.GetHeight() / 2;
                         continue;
                     case '\t':
-                        BX[i] += Font.Size * 4;
+                        BX[i] += Font.GetHeight() * 4;
                         continue;
                 }
 
                 // Get the glyph for this char.
-                Glyph Temp = Font.GetGlyph(TextLines[i][I]);
+                Glyph? Temp = Font.GetGlyph(TextLines[i][I]);
+
+                // Continue if the glyph for this char is null.
+                if (Temp == null)
+                {
+                    continue;
+                }
 
                 // Draw all pixels.
-                for (int P = 0; P < Temp.Points.Count; P++)
+                // Draw the ACF glyph.
+                for (int yy = 0; yy < Temp.Height; yy++)
                 {
-                    // Draw actual pixel.
-                    this[BX[i] + Temp.Points[P].X - (I * -Font.SpacingModifier), BY[i] + Temp.Points[P].Y] = Color;
+                    for (int xx = 0; xx < Temp.Width; xx++)
+                    {
+                        // Get the alpha value of the glyph's pixel and the inverted value.
+                        uint alpha = Temp.Bitmap[yy * Temp.Width + xx];
+                        uint invAlpha = alpha - 2 - (alpha * 2);
 
-                    // Draw shadow.
-                    if (Shadow) { this[BX[i] + Temp.Points[P].X + 1 - (I * -Font.SpacingModifier), BY[i] + Temp.Points[P].Y + 1] = Color.Black; }
+                        // Get the index of the framebuffer of where to draw the point at.
+                        int canvasIdx = (BY[i] + Y + yy - Temp.Top) * Width + BX[i] + X + xx;
+
+                        // Get the background ARGB value and the glyph color's ARGB value.
+                        uint backgroundArgb = Internal[canvasIdx];
+                        uint glyphColorArgb = Color.ARGB;
+
+                        // Store the individual background color's R, G and B values.
+                        byte backgroundR = (byte)((backgroundArgb >> 16) & 0xFF);
+                        byte backgroundG = (byte)((backgroundArgb >> 8) & 0xFF);
+                        byte backgroundB = (byte)(backgroundArgb & 0xFF);
+
+                        // Store the individual glyph foreground color's R, G and B values.
+                        byte foregroundR = (byte)((glyphColorArgb >> 16) & 0xFF);
+                        byte foregroundG = (byte)((glyphColorArgb >> 8) & 0xFF);
+                        byte foregroundB = (byte)((glyphColorArgb) & 0xFF);
+
+                        // Get the individual R, G and B values for the blended color.
+                        byte r = (byte)((alpha * foregroundR + invAlpha * backgroundR) >> 8);
+                        byte g = (byte)((alpha * foregroundG + invAlpha * backgroundG) >> 8);
+                        byte b = (byte)((alpha * foregroundB + invAlpha * backgroundB) >> 8);
+
+                        // Store the blended color in an unsigned integer.
+                        uint color = ((uint)255 << 24) | ((uint)r << 16) | ((uint)g << 8) | b;
+
+                        // Set the pixel to the blended color.
+                        Internal[canvasIdx] = color;
+                    }
                 }
 
                 // Offset the X position by the glyph's length.
                 BX[i] += Temp.Width + 2;
             }
         }
+    }
+
+    /// <summary>
+    /// Draws a string of text at X and Y with a BitFont font.
+    /// </summary>
+    /// <param name="X">X position.</param>
+    /// <param name="Y">Y position.</param>
+    /// <param name="Text">Text to draw.</param>
+    /// <param name="Font">Font to use.</param>
+    /// <param name="Color">The <see cref="Color"/> object to draw with.</param>
+    /// <param name="Center">Option to center the text at X and Y.</param>
+    /// <param name="Shadow">Option to add a shadow to the text.</param>
+    public void DrawString(int X, int Y, string Text, BtfFontFace Font, Color Color, bool Center = false, bool Shadow = false)
+    {
+        // Basic null check.
+        if (string.IsNullOrEmpty(Text))
+        {
+            return;
+        }
+
+        // Quit if nothing needs to be drawn.
+        if (X >= Width || Y >= Height)
+        {
+            return;
+        }
+
+        // Split Text at new line characters.
+        string[] TextLines = Text.Split('\n');
+
+        // Create coordinate arrays.
+        int[] BX = new int[TextLines.Length];
+        int[] BY = new int[TextLines.Length];
+
+        // Set temporary values.
+        for (int i = 0; i < BX.Length; i++) BX[i] = X;
+        for (int i = 0; i < BY.Length; i++) BY[i] = Y + Font.GetHeight() * i;
+
+        // Loop though the split lines.
+        for (int i = 0; i < TextLines.Length; i++)
+        {
+            // Precalculate the string's size.
+            ushort TextWidth = Font.MeasureString(TextLines[i]);
+
+            // Check if the text needs to be centered.
+            if (Center)
+            {
+                BY[i] -= Font.GetHeight() * (TextLines.Length + 1) / 2;
+                BX[i] -= TextWidth / 2;
+            }
+
+            // Loop through each character in the line.
+            for (int I = 0; I < TextLines[i].Length; I++)
+            {
+                switch (TextLines[i][I])
+                {
+                    case '\0':
+                        continue;
+                    case ' ':
+                        BX[i] += Font.GetHeight() / 2;
+                        continue;
+                    case '\t':
+                        BX[i] += Font.GetHeight() * 4;
+                        continue;
+                }
+
+                // Get the glyph for this char.
+                Glyph? Temp = Font.GetGlyph(TextLines[i][I]);
+
+                // Continue if the glyph for this char is null.
+                if (Temp == null)
+                {
+                    continue;
+                }
+
+                // Draw all pixels.
+                for (int P = 0; P < Temp.Points.Count; P++)
+                {
+                    // Draw actual pixel.
+                    this[BX[i] + Temp.Points[P].X - (I * -Font.SpacingModifier()), BY[i] + Temp.Points[P].Y] = Color;
+
+                    // Draw shadow.
+                    if (Shadow) { this[BX[i] + Temp.Points[P].X + 1 - (I * -Font.SpacingModifier()), BY[i] + Temp.Points[P].Y + 1] = Color.Black; }
+                }
+
+                // Offset the X position by the glyph's length.
+                BX[i] += Temp.Width + 2;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Draws a string of text at X and Y with an ACF font.
+    /// </summary>
+    /// <param name="X">X position.</param>
+    /// <param name="Y">Y position.</param>
+    /// <param name="Text">Text to draw.</param>
+    /// <param name="Font">Font to use.</param>
+    /// <param name="Color">The <see cref="Color"/> object to draw with.</param>
+    /// <param name="Center">Option to center the text at X and Y.</param>
+    /// <param name="Shadow">Option to add a shadow to the text.</param>
+    public void DrawString(int X, int Y, string Text, FontFace Font, Color Color, bool Center = false, bool Shadow = false)
+    {
+        if (Font.GetType() == typeof(AcfFontFace)) DrawString(X, Y, Text, (AcfFontFace)Font, Color, Center);
+        else if (Font.GetType() == typeof(BtfFontFace)) DrawString(X, Y, Text, (BtfFontFace)Font, Color, Center, Shadow);
+        else throw new NotImplementedException("Unsupported font type!");
     }
 
     #endregion
