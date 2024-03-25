@@ -585,49 +585,41 @@ public struct Color
 		return _hash;
 	}
 
-	#endregion
+    #endregion
 
-	#region Methods
+    #region Methods
 
-	/// <summary>
-	/// Blends two colors together based on their alpha values.
-	/// </summary>
-	/// <param name="Background">The background color.</param>
-	/// <param name="Foreground">The foreground color.</param>
-	/// <returns>Mixed color.</returns>
-	public static Color AlphaBlend(Color Background, Color Foreground)
-	{
-		if (Foreground._A == 255)
-		{
-			return Foreground;
-		}
-		if (Foreground._A == 0)
-		{
-			return Background;
-		}
+    public static Color AlphaBlend(Color Background, Color Foreground)
+    {
+        if (Foreground.A == 255)
+        {
+            return Foreground;
+        }
+        if (Foreground.A == 0)
+        {
+            return Background;
+        }
 
-		// TODOTODO port over alpha background support from canvas
+        byte alpha = (byte)Foreground.A;
+        int invAlpha = (int)(256 - Foreground.A);
+        return new()
+        {
+            A = 255,
+            R = (byte)((int)(alpha * Foreground.R + invAlpha * Background.R) >> 8),
+            G = (byte)((int)(alpha * Foreground.G + invAlpha * Background.G) >> 8),
+            B = (byte)((int)(alpha * Foreground.B + invAlpha * Background.B) >> 8)
+        };
+    }
 
-		byte alpha = Foreground.A;
-    	int invAlpha = 256 - Foreground.A;
-		return new()
-		{
-			A = 255,
-			R = (byte)((alpha * Foreground._R + invAlpha * Background._R) >> 8),
-			G = (byte)((alpha * Foreground._G + invAlpha * Background._G) >> 8),
-			B = (byte)((alpha * Foreground._B + invAlpha * Background._B) >> 8)
-		};
-	}
-
-	/// <summary>
-	/// Converts an ARGB color to it's packed ARGB format.
-	/// </summary>
-	/// <param name="A">Alpha channel.</param>
-	/// <param name="R">Red channel.</param>
-	/// <param name="G">Green channel.</param>
-	/// <param name="B">Blue channel.</param>
-	/// <returns>Packed value.</returns>
-	private static uint GetPacked(float A, float R, float G, float B)
+    /// <summary>
+    /// Converts an ARGB color to it's packed ARGB format.
+    /// </summary>
+    /// <param name="A">Alpha channel.</param>
+    /// <param name="R">Red channel.</param>
+    /// <param name="G">Green channel.</param>
+    /// <param name="B">Blue channel.</param>
+    /// <returns>Packed value.</returns>
+    private static uint GetPacked(float A, float R, float G, float B)
 	{
 		return BitConverter.ToUInt32(new byte[] { (byte)B, (byte)G, (byte)R, (byte)A });
 	}
