@@ -7,7 +7,7 @@
         <Nullable>enable</Nullable>
         <Optimize>true</Optimize>
         <Title>GrapeGL</Title>
-        <Version>1.0</Version>
+        <Version>1.1.1</Version>
         <Description>A powerful &amp; lightweight graphics library based on PrismAPI </Description>
         <Copyright>Copyright © 2023-2024 Mobren</Copyright>
         <PackageReadmeFile>README.md</PackageReadmeFile>
