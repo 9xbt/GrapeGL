@@ -592,27 +592,30 @@ public struct Color
 	/// <summary>
 	/// Blends two colors together based on their alpha values.
 	/// </summary>
-	/// <param name="Source">The original color.</param>
-	/// <param name="NewColor">The new color to mix.</param>
+	/// <param name="Background">The background color.</param>
+	/// <param name="Foreground">The foreground color.</param>
 	/// <returns>Mixed color.</returns>
-	public static Color AlphaBlend(Color Source, Color NewColor)
+	public static Color AlphaBlend(Color Background, Color Foreground)
 	{
-		if (NewColor.A == 255)
+		if (Foreground._A == 255)
 		{
-			return NewColor;
+			return Foreground;
 		}
-		if (NewColor.A == 0)
+		if (Foreground._A == 0)
 		{
-			return Source;
+			return Background;
 		}
 
-		// Use explicit math here to decrease performance overhead and calculate it properly.
+		// TODOTODO port over alpha background support from canvas
+
+		byte alpha = Foreground.A;
+    	int invAlpha = 256 - Foreground.A;
 		return new()
 		{
 			A = 255,
-			R = (int)NewColor.R + (int)(Source.R * NewColor.A) >> 8,
-			G = (int)NewColor.G + (int)(Source.G * NewColor.A) >> 8,
-			B = (int)NewColor.B + (int)(Source.B * NewColor.A) >> 8,
+			R = (byte)((alpha * Foreground._R + invAlpha * Background._R) >> 8),
+			G = (byte)((alpha * Foreground._G + invAlpha * Background._G) >> 8),
+			B = (byte)((alpha * Foreground._B + invAlpha * Background._B) >> 8)
 		};
 	}
 
