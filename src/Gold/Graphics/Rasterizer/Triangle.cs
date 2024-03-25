@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 
-namespace GrapeGL.Graphics.Rasterizer;
+namespace Gold.Graphics.Rasterizer;
 
 public class Triangle
 {

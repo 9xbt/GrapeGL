@@ -1,7 +1,7 @@
 ﻿using Cosmos.Core.Multiboot;
-using GrapeGL.Graphics;
+using Gold.Graphics;
 
-namespace GrapeGL.Hardware.GPU.VESA;
+namespace Gold.Hardware.GPU.VESA;
 
 /// <summary>
 /// The VBE canvas extention class.

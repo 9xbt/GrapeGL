@@ -1,11 +1,11 @@
 ﻿using Cosmos.Core;
 using Cosmos.System.Graphics.Fonts;
-using GrapeGL.Graphics.Fonts;
-using GrapeGL.Graphics.Rasterizer;
 using System.Numerics;
 using System.Runtime.InteropServices;
+using Gold.Graphics.Fonts;
+using Gold.Graphics.Rasterizer;
 
-namespace GrapeGL.Graphics;
+namespace Gold.Graphics;
 
 /// <summary>
 /// The <see cref="Canvas"/> class, used for rendering content on a 2D surface.

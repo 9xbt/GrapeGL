@@ -8,7 +8,7 @@ using System.Dynamic;
 using System.IO;
 using System.Text;
 
-namespace GrapeGL.Graphics.Fonts;
+namespace Gold.Graphics.Fonts;
 
 /// <summary>
 /// An ACF font face.

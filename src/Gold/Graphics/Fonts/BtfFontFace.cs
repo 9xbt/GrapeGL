@@ -1,5 +1,5 @@
 ﻿/*
- *  GrapeGL - A powerful & lightweight graphics library based on PrismAPI.
+ *  Gold - A powerful & lightweight graphics library based on PrismAPI.
  *  Copyright © 2024 Mobren
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -21,7 +21,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 
-namespace GrapeGL.Graphics.Fonts;
+namespace Gold.Graphics.Fonts;
 
 /// <summary>
 /// A bitfont format font face.

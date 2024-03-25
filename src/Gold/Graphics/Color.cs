@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace GrapeGL.Graphics;
+namespace Gold.Graphics;
 
 /// <summary>
 /// Color class, used for drawing.

@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace GrapeGL.Compression;
+namespace Gold.Compression;
 
 /// <summary>
 /// LZW (De)compression class.

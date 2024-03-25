@@ -1,8 +1,8 @@
 ﻿using System.Runtime.InteropServices;
 using System.Text;
-using GrapeGL.Compression;
+using Gold.Compression;
 
-namespace GrapeGL.Graphics;
+namespace Gold.Graphics;
 
 public unsafe static class Image
 {

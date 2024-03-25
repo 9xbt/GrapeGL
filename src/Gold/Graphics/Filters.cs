@@ -1,6 +1,6 @@
 ﻿using Cosmos.Core;
 
-namespace GrapeGL.Graphics;
+namespace Gold.Graphics;
 
 /// <summary>
 /// The <see cref="Filters"/> class, used to apply advanced filter effects to a graphics canvas.

@@ -6,7 +6,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace GrapeGL.Graphics.Fonts;
+namespace Gold.Graphics.Fonts;
 
 /// <summary>
 /// Represents a single, reusable glyph for a character.

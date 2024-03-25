@@ -1,10 +1,10 @@
 ﻿using Cosmos.Core.Multiboot;
 using Cosmos.System;
-using GrapeGL.Graphics;
-using GrapeGL.Hardware.GPU.VESA;
-using GrapeGL.Hardware.GPU.VMWare;
+using Gold.Graphics;
+using Gold.Hardware.GPU.VESA;
+using Gold.Hardware.GPU.VMWare;
 
-namespace GrapeGL.Hardware.GPU;
+namespace Gold.Hardware.GPU;
 
 /// <summary>
 /// The generic display interface. Used to abstract driver classes and get display output.

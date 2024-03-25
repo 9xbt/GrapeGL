@@ -3,7 +3,7 @@
  *  github.com/mirage-desktop/Mirage
  */
 
-namespace GrapeGL.Graphics.Fonts;
+namespace Gold.Graphics.Fonts;
 
 /// <summary>
 /// A font face.

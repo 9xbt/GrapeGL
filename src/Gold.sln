@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GrapeGL", "GrapeGL\GrapeGL.csproj", "{A44DA0E1-8124-4A07-80DA-02D279732EA7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gold", "Gold\Gold.csproj", "{A44DA0E1-8124-4A07-80DA-02D279732EA7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

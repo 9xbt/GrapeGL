@@ -1,4 +1,4 @@
-﻿namespace GrapeGL.Compression;
+﻿namespace Gold.Compression;
 
 /// <summary>
 /// public domain zlib decode

@@ -1,9 +1,9 @@
 ﻿using Cosmos.Core;
 using Cosmos.HAL;
 using Cosmos.HAL.Drivers.Video.SVGAII;
-using GrapeGL.Graphics;
+using Gold.Graphics;
 
-namespace GrapeGL.Hardware.GPU.VMWare;
+namespace Gold.Hardware.GPU.VMWare;
 
 /// <summary>
 /// The VMWare SVGAII canvas class. Allows for fast(er) graphics.
