@@ -13,7 +13,7 @@ public class Font
 	/// </summary>
 	/// <param name="Binary">Binary of the font file.</param>
 	/// <param name="Size">Height of the font.</param>
-	public Font(byte[] Binary, ushort Size)
+	public Font(byte[] Binary, ushort Size, int SpacingModifier = 0)
 	{
 		// Assign font data.
 		this.Binary = Binary;
@@ -21,6 +21,9 @@ public class Font
 		// Assign size values.
 		Size8 = (ushort)(Size / 8);
 		this.Size = Size;
+		
+		// Assign spacing offset.
+		this.SpacingModifier = SpacingModifier;
 
 		// Create cache instance.
 		Glyphs = new();
@@ -59,7 +62,7 @@ public class Font
 			}
 		}
 
-		return Width;
+		return (ushort)(Width + (Text.Length * SpacingModifier));
 	}
 
 	/// <summary>
@@ -336,6 +339,11 @@ public class Font
 	/// Size (Height) of the font.
 	/// </summary>
 	public ushort Size;
+
+	/// <summary>
+	/// Character spacing offset.
+	/// </summary>
+	public int SpacingModifier;
 
 	#endregion
 }

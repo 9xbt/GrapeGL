@@ -84,9 +84,14 @@ public abstract class Display : Canvas
 	public abstract string GetName();
 
 	/// <summary>
-	/// Coppies the second buffer to the primary display buffer.
+	/// Copies the second buffer to the primary display buffer.
 	/// </summary>
 	public abstract void Update();
+
+	/// <summary>
+	/// Copies the second buffer to the primary display buffer.
+	/// </summary>
+	public abstract void Update(bool IncreaseFPSCounter);
 
 	/// <summary>
 	/// Gets the FPS measurment of the display.
@@ -104,7 +109,7 @@ public abstract class Display : Canvas
 	/// <summary>
 	/// The internal frame counter, used for FPS calculation.
 	/// </summary>
-	internal uint _Frames;
+	public uint _Frames;
 
 	/// <summary>
 	/// The internal FPS value, returned from <see cref="GetFPS()"/>.

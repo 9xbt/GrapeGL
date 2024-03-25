@@ -358,6 +358,9 @@ public unsafe class Canvas
     /// <param name="Color">The <see cref="Color"/> object to draw with.</param>
     public void DrawRectangle(int X, int Y, ushort Width, ushort Height, ushort Radius, Color Color)
     {
+        Width--;  // Rectangles for some reason are 1px larger
+        Height--; // than they should be, this fixes that.
+
         // Draw circles to add curvature if needed.
         if (Radius > 0)
         {
@@ -371,6 +374,7 @@ public unsafe class Canvas
         DrawLine(X + Radius, Y + Height, X + Width - Radius, Height + Y, Color); // Bottom Line
         DrawLine(X, Y + Radius, X, Y + Height - Radius, Color); // Left Line
         DrawLine(X + Width, Y + Radius, Width + X, Y + Height - Radius, Color); // Right Line
+        this[X + Width, Y + Height] = Color; // Bottom Right Corner
     }
 
     /// <summary>
@@ -859,10 +863,12 @@ public unsafe class Canvas
     /// <param name="Font">Font to use.</param>
     /// <param name="Color">The <see cref="Color"/> object to draw with.</param>
     /// <param name="Center">Option to cented the text at X and Y.</param>
+    /// <param name="Shadow">Option to draw a shadow.</param>
+    /// <param name="SpacingModifier">Text spacing modifier.</param>
     public void DrawString(int X, int Y, string Text, Font? Font, Color Color, bool Center = false, bool Shadow = false)
     {
         // Basic null check.
-        if (string.IsNullOrEmpty(Text))
+        if (string.IsNullOrEmpty(Text.Trim()))
         {
             return;
         }
@@ -925,10 +931,10 @@ public unsafe class Canvas
                 for (int P = 0; P < Temp.Points.Count; P++)
                 {
                     // Draw actual pixel.
-                    this[BX[i] + Temp.Points[P].X, BY[i] + Temp.Points[P].Y] = Color;
+                    this[BX[i] + Temp.Points[P].X - (I * -Font.SpacingModifier), BY[i] + Temp.Points[P].Y] = Color;
 
                     // Draw shadow.
-                    if (Shadow) { this[BX[i] + Temp.Points[P].X + 1, BY[i] + Temp.Points[P].Y + 1] = Color.Black; }
+                    if (Shadow) { this[BX[i] + Temp.Points[P].X + 1 - (I * -Font.SpacingModifier), BY[i] + Temp.Points[P].Y + 1] = Color.Black; }
                 }
 
                 // Offset the X position by the glyph's length.
@@ -940,6 +946,17 @@ public unsafe class Canvas
     #endregion
 
     #region Misc
+
+    /// <summary>
+    /// Destroys this instance of the <see cref="Canvas"/> class. Only used when it's finished being used.
+    /// </summary>
+    public void Dispose()
+    {
+        if (Internal != null)
+        {
+            NativeMemory.Free(Internal);
+        }
+    }
 
     /// <summary>
     /// Clears the canvas with the specified color.
@@ -1006,7 +1023,7 @@ public unsafe class Canvas
     /// <summary>
     /// The graphics frame buffer, with a size matching <see cref="Size"/>.
     /// </summary>
-    internal uint* Internal;
+    public uint* Internal;
 
     #endregion
 }

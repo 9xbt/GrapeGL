@@ -2,5 +2,5 @@
 
 A powerful & lightweight graphics library based on PrismAPI.
 
-> [!NOTE]
-> GrapeGL is still a work in progress, and may contain bugs.
+> [!WARNING]
+> This branch of GrapeGL is unstable and might have a few issues & WIP features
