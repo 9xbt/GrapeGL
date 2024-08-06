@@ -879,18 +879,28 @@ public unsafe class Canvas
                     byte ForegroundG = (byte)((ForegroundARGB >> 8) & 0xFF);
                     byte ForegroundB = (byte)((ForegroundARGB) & 0xFF);
 
-                    // Inverse the foreground alpha.
-                    byte InvForegroundA = (byte)(255 - ForegroundA);
+                    if (ForegroundA == 0)
+                    {
+                        // Repack channels.
+                        uint Color = 0xFF000000 | ((uint)BackgroundR << 16) | ((uint)BackgroundG << 8) | BackgroundB;
 
-                    // Calculate blending.
-                    byte R = (byte)((ForegroundA * ForegroundR + InvForegroundA * BackgroundR) >> 8);
-                    byte G = (byte)((ForegroundA * ForegroundG + InvForegroundA * BackgroundG) >> 8);
-                    byte B = (byte)((ForegroundA * ForegroundB + InvForegroundA * BackgroundB) >> 8);
+                        this.Internal[CanvasIndex] = Color;
+                    }
+                    else
+                    {
+                        // Inverse the foreground alpha.
+                        byte InvForegroundA = (byte)(255 - ForegroundA);
 
-                    // Repack channels.
-                    uint Color = 0xFF000000 | ((uint)R << 16) | ((uint)G << 8) | B;
+                        // Calculate blending.
+                        byte R = (byte)((ForegroundA * ForegroundR + InvForegroundA * BackgroundR) >> 8);
+                        byte G = (byte)((ForegroundA * ForegroundG + InvForegroundA * BackgroundG) >> 8);
+                        byte B = (byte)((ForegroundA * ForegroundB + InvForegroundA * BackgroundB) >> 8);
 
-                    this.Internal[CanvasIndex] = Color;
+                        // Repack channels.
+                        uint Color = 0xFF000000 | ((uint)R << 16) | ((uint)G << 8) | B;
+
+                        this.Internal[CanvasIndex] = Color;
+                    }
                 }
             }
         }
